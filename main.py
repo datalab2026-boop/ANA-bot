@@ -1,63 +1,71 @@
 import discord
 from discord.ext import commands, tasks
+import aiohttp
+import asyncio
+import os
+
+# Твои файлы
 import config
 import utils
-import os
-import asyncio
-import aiohttp
 
 class MyBot(commands.Bot):
     def __init__(self):
-        # Для работы со слеш-командами
+        # Настраиваем интенты
         intents = discord.Intents.default()
-        # Если планируешь работать с участниками сервера, 
-        # позже добавим intents.members = True
+        # Для работы со слеш-командами префикс не важен, ставим None
         super().__init__(command_prefix=None, intents=intents)
 
     async def setup_hook(self):
-        # Синхронизируем команды (без лишних принтов, как ты просил)
+        """Выполняется ПЕРЕД тем, как бот выйдет в онлайн"""
+        
+        # В будущем здесь будет код для загрузки твоих Cogs из папки commands
+        # await self.load_extension('commands.название_файла')
+        
+        # Синхронизируем команды (чтобы они появились в Discord)
         await self.tree.sync()
-        # Запускаем фоновую задачу
+        
+        # Запускаем фоновую задачу проверки состояния
         self.status_check.start()
 
-    # Твоя фоновая задача раз в минуту
     @tasks.loop(minutes=1.0)
     async def status_check(self):
-        # Мы убрали принт отсюда по твоему запросу
+        # Пустая задача раз в минуту, как ты просил
         pass
 
     @status_check.before_loop
     async def before_status_check(self):
         await self.wait_until_ready()
 
+# Создаем объект бота
 bot = MyBot()
 
-# Событие активации бота
 @bot.event
 async def on_ready():
-    print(f"--- [Успех] Бот {bot.user} запущен ---")
+    """Событие: Бот успешно подключился к Discord Gateway"""
     
-    # Ищем канал для логов по ID из конфига
+    # 1. Загрузка данных из Roblox через твой config.py
+    try:
+        await config.load_roblox_ranks()
+        roblox_status = "with all Roblox ranks"
+    except Exception as e:
+        roblox_status = "but Roblox ranks FAILED"
+        print(f"Ошибка загрузки рангов: {e}")
+
+    # 2. Отправка зеленого эмбеда в ACTIONS_LOG
     channel = bot.get_channel(config.ACTIONS_LOG)
     
     if channel:
-        # Создаем зеленый эмбед
         embed = discord.Embed(
-            description="✅ Bot successfully loaded to discord gateway with all discord commands",
-            color=0x00FF00 # Чистый зеленый цвет
+            description=f"✅ Bot successfully loaded to discord gateway {roblox_status}",
+            color=0x00FF00
         )
-        # Отправляем в канал
         await channel.send(embed=embed)
-    else:
-        print(f"!!! Ошибка: Не удалось найти канал ACTIONS_LOG с ID {config.ACTIONS_LOG} !!!")
+    
+    print(f"--- [ONLINE] {bot.user} запущен ---")
 
-# Пример простой слеш-команды для теста
-@bot.tree.command(name="ping", description="Проверить отклик")
-async def ping(interaction: discord.Interaction):
-    await interaction.response.send_message("Понг!", ephemeral=True)
-
+# Запуск программы
 if __name__ == "__main__":
     if config.DISCORD_TOKEN:
         bot.run(config.DISCORD_TOKEN)
     else:
-        print("!!! Ошибка: Токен не найден в config.py !!!")
+        print("КРИТИЧЕСКАЯ ОШИБКА: DISCORD_TOKEN не найден в config.py!")
