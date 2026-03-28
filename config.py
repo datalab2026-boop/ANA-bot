@@ -9,9 +9,9 @@ RESTART_TOKEN = os.environ.get("Restarttoken")
 
 # --- Константы группы ---
 RB_GROUP_ID = 841435331
-ALLOWED_ROLES = 0
-ACTIONS_LOG = 0
-BUG_LOGS = 0
+ALLOWED_ROLES = 1479884336051388604
+ACTIONS_LOG = 1481718190961590392
+BUG_LOGS = 1487248340252098770
 
 # --- Динамические данные (заполняются через setup) ---
 RANKS = {}        
