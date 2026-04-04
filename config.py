@@ -5,6 +5,7 @@ CLOUD_API = os.environ.get("CloudAPI")
 RESTART_TOKEN = os.environ.get("RestartToken")
 ROVER_API = os.environ.get("RoverAPI")
 MONGO_URL = os.environ.get("MONGO_URL")
+SHEET_KEY = os.environ.get("SheetKey")
 # Maintenance
 ERROR_CHANNEL = 0
 LOGS_CHANNEL = 0
