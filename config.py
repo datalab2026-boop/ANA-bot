@@ -7,6 +7,7 @@ ROVER_API = os.environ.get("RoverAPI")
 MONGO_URL = os.environ.get("MONGO_URL")
 SHEET_KEY = os.environ.get("SheetKey")
 # Maintenance
+GROUP_ID = 0
 ERROR_CHANNEL = 0
 LOGS_CHANNEL = 0
-PERMITTED_ROLES = [] #Write ", " between each discord role ID
+PERMITTED_ROLES = [] # Write ", " between each discord role ID
